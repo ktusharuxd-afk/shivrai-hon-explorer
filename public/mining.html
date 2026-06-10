@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHIVRAI HON Miner</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;background:#090909;color:#fff;min-height:100vh}
+.wrap{max-width:900px;margin:0 auto;padding:40px 20px}
+header{text-align:center;margin-bottom:40px}
+header img{height:60px;margin-bottom:15px}
+header h1{font-size:2em;font-weight:700;background:linear-gradient(135deg,#FFB300,#FF6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:#666;font-size:0.9em;margin-top:5px}
+.status-bar{background:#111;border:1px solid rgba(255,179,0,0.15);border-radius:16px;padding:20px 25px;display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:15px}
+.node-status{display:flex;align-items:center;gap:8px;font-size:0.85em;font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%}
+.dot-green{background:#4ade80;animation:pulse 1.5s infinite}
+.dot-red{background:#f87171}
+.dot-yellow{background:#FFB300;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(74,222,128,0.4)}50%{box-shadow:0 0 0 6px rgba(74,222,128,0)}}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;margin-bottom:25px}
+.stat{background:#111;border:1px solid rgba(255,179,0,0.12);border-radius:16px;padding:22px 18px;text-align:center;transition:all 0.3s}
+.stat:hover{border-color:rgba(255,179,0,0.35);transform:translateY(-3px)}
+.stat-icon{font-size:1.8em;margin-bottom:8px}
+.stat-val{font-size:1.8em;font-weight:700;color:#FFB300}
+.stat-lbl{font-size:0.72em;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+.box{background:#111;border:1px solid rgba(255,179,0,0.15);border-radius:20px;padding:25px;margin-bottom:20px}
+.box h2{font-size:1em;font-weight:600;margin-bottom:15px;color:#fff}
+.lbl{font-size:0.75em;color:#555;margin-bottom:5px}
+.inp{width:100%;background:#0d0d0d;border:1px solid rgba(255,179,0,0.2);border-radius:10px;padding:11px 15px;color:#fff;font-family:'Poppins',sans-serif;font-size:0.83em;margin-bottom:12px;outline:none}
+.inp:focus{border-color:rgba(255,179,0,0.5)}
+.cfg-row{display:flex;gap:10px;flex-wrap:wrap}
+.cfg-item{flex:1;min-width:130px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:5px}
+.btn{padding:12px 24px;border-radius:50px;font-weight:600;font-size:0.88em;cursor:pointer;border:none;font-family:'Poppins',sans-serif;transition:all 0.3s;display:inline-flex;align-items:center;gap:7px}
+.btn-gold{background:linear-gradient(135deg,#FFB300,#FF8C00);color:#000}
+.btn-gold:hover{box-shadow:0 0 25px rgba(255,179,0,0.5);transform:translateY(-2px)}
+.btn-gold:disabled{background:#333;color:#666;cursor:not-allowed;box-shadow:none;transform:none}
+.btn-red{background:transparent;border:1.5px solid #f87171;color:#f87171}
+.btn-red:disabled{opacity:0.3;cursor:not-allowed}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,179,0,0.35);color:#FFB300}
+.btn-outline:hover{background:rgba(255,179,0,0.08)}
+.anim{text-align:center;padding:15px;display:none}
+.ring{width:60px;height:60px;border:3px solid rgba(255,179,0,0.1);border-top:3px solid #FFB300;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 10px}
+@keyframes spin{100%{transform:rotate(360deg)}}
+.anim-txt{color:#FFB300;font-size:0.85em}
+.logbox{background:#0a0a0a;border:1px solid rgba(255,179,0,0.06);border-radius:12px;padding:12px;height:200px;overflow-y:auto;font-family:'Courier New',monospace;font-size:0.76em}
+.le{padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.le.ok{color:#4ade80}
+.le.err{color:#f87171}
+.le.inf{color:#FFB300}
+.le.dim{color:#333}
+footer{text-align:center;padding:25px 0;color:#333;font-size:0.78em;border-top:1px solid rgba(255,179,0,0.06);margin-top:10px}
+footer a{color:#FFB300;text-decoration:none}
+@media(max-width:600px){.cfg-row{flex-direction:column}.btn-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <img src="/honcoinlogo.svg" alt="HON" onerror="this.style.display='none'">
+  <h1>SHIVRAI HON Miner</h1>
+  <p>Web Mining Dashboard</p>
+</header>
+
+<div class="status-bar">
+  <div class="node-status" id="nodeStatus"><span class="dot dot-yellow"></span> Connecting...</div>
+  <div style="font-size:0.76em;color:#444" id="lastUpdate">—</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat"><div class="stat-icon">💰</div><div class="stat-val" id="balance">—</div><div class="stat-lbl">Balance HON</div></div>
+  <div class="stat"><div class="stat-icon">🧱</div><div class="stat-val" id="blocks">—</div><div class="stat-lbl">Total Blocks</div></div>
+  <div class="stat"><div class="stat-icon">⛏️</div><div class="stat-val" id="mined">0</div><div class="stat-lbl">Session Mined</div></div>
+  <div class="stat"><div class="stat-icon">🔗</div><div class="stat-val" id="network">—</div><div class="stat-lbl">Network</div></div>
+</div>
+
+<div class="box">
+  <h2>⚙️ Node Config</h2>
+  <div class="cfg-row">
+    <div class="cfg-item" style="flex:2">
+      <div class="lbl">RPC URL</div>
+      <input class="inp" id="rpcUrl" value="http://127.0.0.1:8332">
+    </div>
+    <div class="cfg-item">
+      <div class="lbl">Username</div>
+      <input class="inp" id="rpcUser" value="shivraiuser">
+    </div>
+    <div class="cfg-item">
+      <div class="lbl">Password</div>
+      <input class="inp" type="password" id="rpcPass" placeholder="your password">
+    </div>
+  </div>
+  <button class="btn btn-outline" onclick="loadStats()">🔄 Connect Node</button>
+</div>
+
+<div class="box">
+  <h2>⛏️ Mining</h2>
+  <div class="lbl">Mining Address</div>
+  <input class="inp" id="addr" placeholder="bc1q... your HON address (empty = auto)">
+  <div class="btn-row">
+    <button class="btn btn-gold" id="btnStart" onclick="startMining()">▶ Start Mining</button>
+    <button class="btn btn-red" id="btnStop" onclick="stopMining()" disabled>⏹ Stop</button>
+    <button class="btn btn-outline" onclick="getAddr()">🔑 New Address</button>
+    <button class="btn btn-outline" onclick="checkBal()">💰 Balance</button>
+  </div>
+  <div class="anim" id="anim">
+    <div class="ring"></div>
+    <div class="anim-txt" id="animTxt">Mining block...</div>
+  </div>
+</div>
+
+<div class="box">
+  <h2>📋 Log</h2>
+  <div class="logbox" id="log">
+    <div class="le dim">// Log will appear here...</div>
+  </div>
+</div>
+
+<footer>
+  SHIVRAI HON Miner &nbsp;|&nbsp;
+  <a href="/">Explorer</a> &nbsp;|&nbsp;
+  <a href="https://ktusharuxd-afk.github.io/shivrai-hon-website" target="_blank">Website</a>
+</footer>
+</div>
+
+<script>
+let timer=null, count=0;
+
+function addLog(msg,type='dim'){
+  const b=document.getElementById('log');
+  const t=new Date().toLocaleTimeString();
+  const d=document.createElement('div');
+  d.className='le '+type;
+  d.textContent='['+t+'] '+msg;
+  b.insertBefore(d,b.firstChild);
+  if(b.children.length>60)b.removeChild(b.lastChild);
+}
+
+async function rpc(method,params=[]){
+  const url=document.getElementById('rpcUrl').value||'http://127.0.0.1:8332';
+  const user=document.getElementById('rpcUser').value||'shivraiuser';
+  const pass=document.getElementById('rpcPass').value||'';
+  const r=await fetch('/api/rpc',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({method,params,rpcUrl:url,rpcUser:user,rpcPass:pass})
+  });
+  const d=await r.json();
+  if(d.error)throw new Error(d.error);
+  return d.result;
+}
+
+async function loadStats(){
+  try{
+    const i=await rpc('getblockchaininfo');
+    document.getElementById('blocks').textContent=i.blocks??'—';
+    document.getElementById('network').textContent=(i.chain||'—').toUpperCase();
+    document.getElementById('nodeStatus').innerHTML='<span class="dot dot-green"></span> Node Online';
+    document.getElementById('lastUpdate').textContent='Updated: '+new Date().toLocaleTimeString();
+    try{const b=await rpc('getbalance');document.getElementById('balance').textContent=parseFloat(b).toFixed(2);}catch(e){}
+  }catch(e){
+    document.getElementById('nodeStatus').innerHTML='<span class="dot dot-red"></span> Node Offline';
+    document.getElementById('blocks').textContent='—';
+    document.getElementById('network').textContent='—';
+    addLog('Node offline: '+e.message,'err');
+  }
+}
+
+async function getAddr(){
+  try{
+    const a=await rpc('getnewaddress');
+    document.getElementById('addr').value=a;
+    addLog('Address: '+a,'inf');
+  }catch(e){addLog('Error: '+e.message,'err');}
+}
+
+async function checkBal(){
+  try{
+    const b=await rpc('getbalance');
+    document.getElementById('balance').textContent=parseFloat(b).toFixed(2);
+    addLog('Balance: '+b+' HON','ok');
+  }catch(e){addLog('Error: '+e.message,'err');}
+}
+
+async function mineOne(){
+  try{
+    let a=document.getElementById('addr').value.trim();
+    if(!a){a=await rpc('getnewaddress');document.getElementById('addr').value=a;}
+    document.getElementById('animTxt').textContent='Mining block #'+(parseInt(document.getElementById('blocks').textContent||0)+1)+'...';
+    const r=await rpc('generatetoaddress',[1,a]);
+    if(r&&r.length){
+      count++;
+      document.getElementById('mined').textContent=count;
+      addLog('Block mined! '+r[0].substring(0,16)+'...','ok');
+      await loadStats();
+    }
+  }catch(e){addLog('Mine error: '+e.message,'err');}
+}
+
+function startMining(){
+  if(timer)return;
+  document.getElementById('btnStart').disabled=true;
+  document.getElementById('btnStop').disabled=false;
+  document.getElementById('anim').style.display='block';
+  addLog('Mining started!','inf');
+  mineOne();
+  timer=setInterval(mineOne,10000);
+}
+
+function stopMining(){
+  clearInterval(timer);timer=null;
+  document.getElementById('btnStart').disabled=false;
+  document.getElementById('btnStop').disabled=true;
+  document.getElementById('anim').style.display='none';
+  addLog('Mining stopped.','inf');
+}
+
+loadStats();
+setInterval(loadStats,30000);
+</script>
+</body>
+</html>
