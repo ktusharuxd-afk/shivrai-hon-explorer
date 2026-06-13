@@ -16,10 +16,11 @@ body{font-family:'Poppins',sans-serif;background:var(--dark);color:#fff;min-heig
 
 /* HEADER */
 .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px;flex-wrap:wrap;gap:15px}
-.hdr-left{display:flex;align-items:center;gap:15px}
+.hdr-left{display:flex;align-items:center;gap:15px;flex-direction:row}
 .hdr-left img{height:50px;object-fit:contain}
-.hdr-title h1{font-size:1.4em;font-weight:700;background:linear-gradient(135deg,#FFB300,#FF6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hdr-title p{color:#555;font-size:0.78em}
+.hdr-title h1{font-size:1.3em;font-weight:700;background:linear-gradient(135deg,#FFB300,#FF6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:inline}
+.hdr-title p{color:#555;font-size:0.78em;display:inline;margin-left:8px}
+.hdr-title p::before{content:' | ';color:#333}
 .hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .live-badge{display:flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);color:#4ade80;padding:7px 14px;border-radius:50px;font-size:0.78em;font-weight:500}
 .live-dot{width:7px;height:7px;background:#4ade80;border-radius:50%;animation:live 1.5s infinite}
