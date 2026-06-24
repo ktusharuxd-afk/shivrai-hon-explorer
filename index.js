@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(express.static('public'));
-const RPC_URL = process.env.RPC_URL || 'http://shivraiuser:honpassword123@127.0.0.1:18555';
+const RPC_URL = process.env.RPC_URL || 'http://127.0.0.1:18555';
 async function rpc(method, params = []) {
     const res = await axios.post(RPC_URL, {jsonrpc: '1.0', id: 'explorer', method, params}, {timeout: 5000});
     return res.data.result;
@@ -36,7 +36,7 @@ app.post('/api/rpc', async (req, res) => {
     try {
         const {method, params, rpcUrl, rpcUser, rpcPass} = req.body;
         const url = rpcUrl || 'http://127.0.0.1:8332';
-        const auth = Buffer.from((rpcUser||'shivraiuser')+':'+(rpcPass||'honpassword123')).toString('base64');
+        const auth = Buffer.from((rpcUser||'shivraiuser')+':'+(rpcPass||'pass')).toString('base64');
         const result = await axios.post(url, {jsonrpc:'1.0',id:'miner',method,params}, {
             headers:{Authorization:'Basic '+auth},
             timeout:30000
